@@ -1,0 +1,20 @@
+{
+  "name": "leads-capture-express",
+  "version": "0.1.0",
+  "description": "Leads Capture API built on Express",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "nodemon server.js"
+  },
+  "author": "Andy Fusniak",
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1",
+    "nodemon": "^1.17.3",
+    "supertest": "^3.0.0"
+  }
+}
