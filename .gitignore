@@ -1,2 +1,3 @@
+*.tgz
 credentials.json
 node_modules/
