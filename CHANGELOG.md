@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.3 (1 May 2018)
++ Remove console.log statements
+
+## 0.2.2 (1 May 2018)
++ Release with correct package.json
+
 ## 0.2.1 (30 April 2018)
 + Git ignore .tgz files from npm pack
 
