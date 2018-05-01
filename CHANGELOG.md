@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.0 (1 May 2018)
++ Removes hardcoded credentials and accepts them as parameter
+
 ## 0.2.3 (1 May 2018)
 + Remove console.log statements
 
