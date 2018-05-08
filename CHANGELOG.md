@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.4.0 (8 May 2018)
++ HTTP POST /projects
+
 ## 0.3.0 (1 May 2018)
 + Removes hardcoded credentials and accepts them as parameter
 
