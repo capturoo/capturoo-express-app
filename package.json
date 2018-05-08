@@ -1,6 +1,6 @@
 {
   "name": "leads-capture-express",
-  "version": "0.3.0",
+  "version": "0.4.0-dev",
   "description": "Leads Capture API built on Express",
   "main": "lib/app.js",
   "scripts": {
