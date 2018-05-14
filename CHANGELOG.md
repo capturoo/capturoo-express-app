@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.5.0 (14 May 2018)
++ Change package.json to rename project as the repository has been renamed
++ Dependencies supertest 3.0.0 -> 3.1.0
+
 ## 0.4.0 (8 May 2018)
 + HTTP POST /projects
 
@@ -23,4 +27,3 @@
 
 ## 0.1.0 (30 April 2018)
 + Lead Capture API POST /leads
-
