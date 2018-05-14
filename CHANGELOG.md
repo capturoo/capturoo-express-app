@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.6.0 (14 May 2018)
++ Change project name (typo)
+
 ## 0.5.0 (14 May 2018)
 + Change package.json to rename project as the repository has been renamed
 + Dependencies supertest 3.0.0 -> 3.1.0

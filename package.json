@@ -1,6 +1,6 @@
 {
-  "name": "capturo-express-app",
-  "version": "0.5.0",
+  "name": "capturoo-express-app",
+  "version": "0.6.0",
   "description": "Leads Capture API built on Express",
   "main": "lib/app.js",
   "scripts": {
