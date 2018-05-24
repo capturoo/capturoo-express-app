@@ -1,6 +1,6 @@
 {
   "name": "capturoo-express-app",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Leads Capture API built on Express",
   "main": "lib/app.js",
   "scripts": {
@@ -9,16 +9,17 @@
   },
   "author": "Andy Fusniak",
   "dependencies": {
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "express-jsonschema": "^1.1.6",
-    "firebase-admin": "^5.12.0"
+    "firebase-admin": "^5.12.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.1.1",
-    "nodemon": "^1.17.4",
+    "eslint": "^4.19.1",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.17.5",
     "supertest": "^3.1.0"
   }
 }
