@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.7.0 (24 May 2018)
++ Local server config is moved to config.json to include credentials and database properties
++ 
+
 ## 0.6.0 (14 May 2018)
 + Change project name (typo)
 
