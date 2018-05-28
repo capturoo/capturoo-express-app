@@ -1,8 +1,14 @@
 # CHANGELOG
 
+## 0.9.0 (28 May 2018)
++ Transactional lead counter
++ Helper code script to count leads in a collection
+
+## 0.8.0 (25 May 2018)
++ Order and limit on getAllLeads
+
 ## 0.7.0 (24 May 2018)
 + Local server config is moved to config.json to include credentials and database properties
-+ 
 
 ## 0.6.0 (14 May 2018)
 + Change project name (typo)
