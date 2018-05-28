@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.1 (28 May 2018)
++ Fix package version tag
++ Add repository line to package.json
+
 ## 0.9.0 (28 May 2018)
 + Transactional lead counter
 + Helper code script to count leads in a collection

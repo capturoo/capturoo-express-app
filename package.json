@@ -1,13 +1,18 @@
 {
   "name": "capturoo-express-app",
-  "version": "0.8.0",
-  "description": "Leads Capture API built on Express",
+  "version": "0.9.1",
+  "description": "Capturoo API built on Node.js / Express",
   "main": "lib/app.js",
   "scripts": {
     "test": "mocha",
     "start": "nodemon server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:andyfusniakteam/capturoo-express-app.git"
+  },
   "author": "Andy Fusniak",
+  "license": "UNLICENSED",
   "dependencies": {
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
