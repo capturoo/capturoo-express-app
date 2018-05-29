@@ -1,6 +1,6 @@
 {
   "name": "capturoo-express-app",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Capturoo API built on Node.js / Express",
   "main": "lib/app.js",
   "scripts": {
