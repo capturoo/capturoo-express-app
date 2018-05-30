@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.10.0 (30 May 2018)
++ Firebase authentication and token verification
++ Batch delete (DELETE /projects/:projectId returns 204)
++ Adds upertest integration testing
+
 ## 0.9.1 (28 May 2018)
 + Fix package version tag
 + Add repository line to package.json

@@ -4,12 +4,30 @@
   "description": "Capturoo API built on Node.js / Express",
   "main": "lib/app.js",
   "scripts": {
-    "test": "mocha",
-    "start": "nodemon server.js"
+    "coverage": "google-chrome ./coverage/index.html",
+    "start": "nodemon --inspect server.js",
+    "test": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest nyc --all --clean --reporter=html mocha"
   },
   "repository": {
     "type": "git",
     "url": "git@bitbucket.org:andyfusniakteam/capturoo-express-app.git"
+  },
+  "nyc": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "index.js",
+      "config.js",
+      "webpack.config.js",
+      "coverage/**",
+      "test/**",
+      "test{,-*}.js",
+      "**/*.test.js",
+      "**/*_test.js",
+      "**/__tests__/**",
+      "**/node_modules/**"
+    ]
   },
   "author": "Andy Fusniak",
   "license": "UNLICENSED",
@@ -21,10 +39,12 @@
     "firebase-admin": "^5.12.1"
   },
   "devDependencies": {
+    "capturoo-dashboard-sdk": "file:../capturoo-dashboard-sdk",
     "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
+    "nyc": "^11.8.0",
     "supertest": "^3.1.0"
   }
 }
