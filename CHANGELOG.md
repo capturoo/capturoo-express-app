@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.11.2 (30 May 2018)
++ Fixes deletion of project including leads
+
 ## 0.11.1 (30 May 2018)
 + Fixes broken package tag
 

@@ -7,6 +7,7 @@ const { DashboardSDK } = require('capturoo-dashboard-sdk');
 const config = require('../config');
 const clientConfig = require('../client-config');
 
+const TIMEOUT_SETUP_MS = 30 * 1000;
 const TIMEOUT_MS = 10 * 1000;
 const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
 const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
@@ -30,7 +31,7 @@ describe('API Integration tests', () => {
   // Create the Express app, a DashboardSDK client and signIn retreiving a JWT
   // that is used for all subsequent requests
   before(function(done) {
-    this.timeout(TIMEOUT_MS);
+    this.timeout(TIMEOUT_SETUP_MS);
    
     if (TEST_ENDPOINT === 'app') { 
       const ExpressApp = require('../lib/app');
@@ -53,7 +54,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should retrieve the current user (${TEST_EMAIL}) account`, function(done) {
+  it(`should retrieve the current user '${TEST_EMAIL}' account`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get('/account')
@@ -82,7 +83,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should create a new project (${newProjectId})`, function(done) {
+  it(`should create a new project '${newProjectId}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .post('/projects')
@@ -114,7 +115,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should check project (${newProjectId}) exists`, function(done) {
+  it(`should check project '${newProjectId}' exists`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .head(`/projects/${newProjectId}`)
@@ -131,7 +132,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should ensure project (${newProjectId}-not-there) does not exist`, function(done) {
+  it(`should ensure project '${newProjectId}-not-there' does not exist`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .head(`/projects/${newProjectId}-not-there`)
@@ -149,7 +150,7 @@ describe('API Integration tests', () => {
       }); 
   });
 
-  it(`should fail to create the same project (${newProjectId})`, function(done) {
+  it(`should fail to create the same project '${newProjectId}'`, function(done) {
   	this.timeout(TIMEOUT_MS);
     request(endpoint)  
       .post('/projects')
@@ -177,7 +178,7 @@ describe('API Integration tests', () => {
 
   });
 
-  it(`should retrieve a project (${newProjectId}) using its id`, function(done) {
+  it(`should get project '${newProjectId}' by its id`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/${newProjectId}`)
@@ -209,7 +210,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should fail retrieve a project (${newProjectId}) because of missing x-access-token`, function(done) {
+  it(`should fail to get project '${newProjectId}' because it is missing x-access-token`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/${newProjectId}`)
@@ -275,7 +276,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should delete project ${newProjectId}`, function(done) {
+  it(`should delete project '${newProjectId}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .delete(`/projects/${newProjectId}`)
@@ -290,6 +291,55 @@ describe('API Integration tests', () => {
 
         assert.isObject(res.body);
         assert.isEmpty(res.body);
+        done();
+      });
+  });
+
+  it(`should fail to delete project '${newProjectId}' as it just got deleted`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+      .delete(`/projects/${newProjectId}`)
+      .set('Content-Type', 'application/json')
+      .set('x-access-token', token)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) {
+          console.error(res.text);
+          return done(err);
+        }
+
+        assert.isObject(res.body);
+        assert.hasAllKeys(res.body, [
+          'status',
+          'message'
+        ]);
+        assert.strictEqual(res.body.status, 404);
+        assert.strictEqual(res.body.message, 'projects/project-not-found');
+        done();
+      });
+  });
+
+  it(`should fail to retrieve the previously deleted project '${newProjectId}'`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+      .get(`/projects/${newProjectId}`)
+      .set('Content-Type', 'application/json')
+      .set('x-access-token', token)
+      .expect('Content-Type', /application\/json/)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) {
+          console.error(res.text);
+          return done(err);
+        }
+
+        assert.isObject(res.body);
+        assert.hasAllKeys(res.body, [
+          'status',
+          'message'
+        ]);
+        assert.strictEqual(res.body.status, 404);
+        assert.strictEqual(res.body.message, 'projects/project-not-found');
         done();
       });
   });
