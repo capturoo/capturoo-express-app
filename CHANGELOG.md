@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.11.1 (30 May 2018)
++ Fixes broken package tag
+
 ## 0.11.0 (30 May 2018)
 + improve integration test to optionally display JWT
 + x-timing headers for firestore
