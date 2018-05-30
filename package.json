@@ -6,8 +6,8 @@
   "scripts": {
     "coverage": "google-chrome ./coverage/index.html",
     "start": "nodemon --inspect server.js",
-    "test": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest nyc --all --clean --reporter=html mocha",
-    "test-staging": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=https://api-staging.capturoo.com nyc --all --clean --reporter=html mocha"
+    "test": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_SHOWTOKEN=true nyc --all --clean --reporter=html mocha",
+    "test-staging": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=https://api-staging.capturoo.com mocha"
   },
   "repository": {
     "type": "git",

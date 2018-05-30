@@ -7,9 +7,10 @@ const { DashboardSDK } = require('capturoo-dashboard-sdk');
 const config = require('../config');
 const clientConfig = require('../client-config');
 
-const TIMEOUT_MS = 30 * 1000;
+const TIMEOUT_MS = 10 * 1000;
 const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
 const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
+const TEST_SHOWTOKEN = (process.env.TEST_SHOWTOKEN === 'true') ? true : false;
 
 describe('API Integration tests', () => {
   var endpoint;
@@ -42,7 +43,9 @@ describe('API Integration tests', () => {
 		sdk.signInWithEmailAndPassword(TEST_EMAIL, process.env.TEST_PASSWORD)
       .then(userCredential => {
         token = sdk.idTokenResult.token;
-        console.log(token);
+        if (TEST_SHOWTOKEN) {
+          console.log(token);
+        }
         done();
       })
       .catch(err => {
@@ -267,7 +270,6 @@ describe('API Integration tests', () => {
           console.error(res.text);
           return done(err);
         }
-        
         assert.isArray(res.body);
         done();
       });
@@ -286,7 +288,8 @@ describe('API Integration tests', () => {
           return done(err);
         }
 
-        console.log(res.text);
+        assert.isObject(res.body);
+        assert.isEmpty(res.body);
         done();
       });
   });
