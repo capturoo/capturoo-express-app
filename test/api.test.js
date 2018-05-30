@@ -1,19 +1,18 @@
 'use strict';
 const crypto = require('crypto');
-const supertest = require('supertest');
+const request = require('supertest');
 const chai = require('chai');
 const assert = chai.assert;
-const ExpressApp = require('../lib/app');
 const { DashboardSDK } = require('capturoo-dashboard-sdk');
 const config = require('../config');
 const clientConfig = require('../client-config');
 
 const TIMEOUT_MS = 30 * 1000;
-
-const TEST_EMAIL = process.env.TEST_EMAIL;
+const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
+const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
 
 describe('API Integration tests', () => {
-  var app;
+  var endpoint;
   var sdk;
   var token;
   var accountObj;
@@ -31,7 +30,14 @@ describe('API Integration tests', () => {
   // that is used for all subsequent requests
   before(function(done) {
     this.timeout(TIMEOUT_MS);
-    app = new ExpressApp(config);
+   
+    if (TEST_ENDPOINT === 'app') { 
+      const ExpressApp = require('../lib/app');
+      endpoint = new ExpressApp(config);
+    } else {
+      endpoint = TEST_ENDPOINT;
+    }
+
     sdk = new DashboardSDK(clientConfig);
 		sdk.signInWithEmailAndPassword(TEST_EMAIL, process.env.TEST_PASSWORD)
       .then(userCredential => {
@@ -46,7 +52,7 @@ describe('API Integration tests', () => {
 
   it(`should retrieve the current user (${TEST_EMAIL}) account`, function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .get('/account')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -75,7 +81,7 @@ describe('API Integration tests', () => {
 
   it(`should create a new project (${newProjectId})`, function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .post('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -105,9 +111,44 @@ describe('API Integration tests', () => {
       });
   });
 
+  it(`should check project (${newProjectId}) exists`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+      .head(`/projects/${newProjectId}`)
+      .set('x-access-token', token)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) {
+          console.error(res.text);
+          return done(err);
+        }
+        assert.isObject(res.body);
+        assert.isEmpty(res.body);
+        done();
+      });
+  });
+
+  it(`should ensure project (${newProjectId}-not-there) does not exist`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+      .head(`/projects/${newProjectId}-not-there`)
+      .set('x-access-token', token)
+      .expect(404)
+      .end(function(err, res) {
+        if (err) {
+          console.error(res.text);
+          return done(err);
+        }
+
+        assert.isObject(res.body);
+        assert.isEmpty(res.body);
+        done();
+      }); 
+  });
+
   it(`should fail to create the same project (${newProjectId})`, function(done) {
   	this.timeout(TIMEOUT_MS);
-    supertest(app)  
+    request(endpoint)  
       .post('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -135,7 +176,7 @@ describe('API Integration tests', () => {
 
   it(`should retrieve a project (${newProjectId}) using its id`, function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .get(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -167,7 +208,7 @@ describe('API Integration tests', () => {
 
   it(`should fail retrieve a project (${newProjectId}) because of missing x-access-token`, function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .get(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .expect('Content-Type', /application\/json/)
@@ -190,7 +231,7 @@ describe('API Integration tests', () => {
 
   it('should fail to retrieve a project that does not exist', function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .get(`/projects/no-such-project-${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -215,7 +256,7 @@ describe('API Integration tests', () => {
 
   it('should retrieve a list of all projects', function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .get('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -234,7 +275,7 @@ describe('API Integration tests', () => {
 
   it(`should delete project ${newProjectId}`, function(done) {
     this.timeout(TIMEOUT_MS);
-    supertest(app)
+    request(endpoint)
       .delete(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
