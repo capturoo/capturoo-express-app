@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.14.0 (31 May 2018)
++ Pagination with startAt
++ Improved unit testing
+
 ## 0.13.0 (31 May 2018)
 + Change leads to use { system, data, lead}
 + Get leads with ordering and direction

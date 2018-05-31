@@ -48,6 +48,7 @@ describe('API Integration tests', () => {
   var accountObj;
   var publicApiKey;
   var leadIds = [];
+  var startAfter;
 
 	var newProjectId = (function () {
     let base62 = '0123456789';
@@ -440,6 +441,200 @@ describe('API Integration tests', () => {
       for (const item of res.body) {
         leadIds.push(item.leadId);
       }
+      done();
+    });
+  });
+
+  it('should get leads orderBy system.created ascending limit 2', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&limit=2`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 2);
+
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'David',
+        lastname: 'Smith',
+        age: 42
+      });
+
+      assert.isObject(res.body[1]);
+      assert.deepEqual(res.body[1].lead, {
+        firstname: 'Borris',
+        lastname: 'Johnson',
+        age: 56
+      });
+
+      startAfter = res.body[1].system.created;
+      done();
+    });
+  });
+
+  it('should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 2);
+
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'Julia',
+        lastname: 'Carter',
+        age: 28
+      });
+
+      assert.isObject(res.body[1]);
+      assert.deepEqual(res.body[1].lead, {
+        firstname: 'Paul',
+        lastname: 'Rogers',
+        age: 34
+      });
+
+      startAfter = res.body[1].system.created;
+      done();
+    });
+  });
+
+  it('should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 1);
+
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'Fred',
+        lastname: 'Blogs',
+        age: 27
+      });
+
+      done();
+    });
+  });
+
+  it('should get leads orderBy system.created descending limit 2', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&limit=2`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 2);
+
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'Fred',
+        lastname: 'Blogs',
+        age: 27
+      });
+
+      assert.isObject(res.body[1]);
+      assert.deepEqual(res.body[1].lead, {
+        firstname: 'Paul',
+        lastname: 'Rogers',
+        age: 34
+      });
+
+      startAfter = res.body[1].system.created;
+      done();
+    });
+  });
+
+  it('should get leads orderBy system.created descending startAfter last limit 2', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 2);
+
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'Julia',
+        lastname: 'Carter',
+        age: 28
+      });
+
+      assert.isObject(res.body[1]);
+      assert.deepEqual(res.body[1].lead, {
+        firstname: 'Borris',
+        lastname: 'Johnson',
+        age: 56
+      });
+
+      startAfter = res.body[1].system.created;
+      done();
+    });
+  });
+
+  it('should get leads orderBy system.created descending startAfter last limit 2', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 1);
+
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'David',
+        lastname: 'Smith',
+        age: 42
+      });
+
       done();
     });
   });
