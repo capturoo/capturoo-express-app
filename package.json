@@ -1,13 +1,13 @@
 {
   "name": "capturoo-express-app",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Capturoo API built on Node.js / Express",
   "main": "lib/app.js",
   "scripts": {
     "coverage": "google-chrome ./coverage/index.html",
     "start": "nodemon --inspect server.js",
-    "test": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_SHOWTOKEN=true nyc --all --clean --reporter=html mocha",
-    "test-staging": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=https://api-staging.capturoo.com mocha"
+    "test": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_SHOWTOKEN=true nyc --all --clean --reporter=html mocha --slow 3000",
+    "test-staging": "env TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=https://api-staging.capturoo.com mocha --slow 2000"
   },
   "repository": {
     "type": "git",

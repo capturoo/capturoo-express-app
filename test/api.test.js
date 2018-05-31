@@ -47,6 +47,7 @@ describe('API Integration tests', () => {
   var token;
   var accountObj;
   var publicApiKey;
+  var leadIds = [];
 
 	var newProjectId = (function () {
     let base62 = '0123456789';
@@ -267,7 +268,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`GetProject: should fail to get project '${newProjectId}' because it is missing x-access-token`, function(done) {
+  it(`GetProject: should fail to get project '${newProjectId}' as missing x-access-token`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/${newProjectId}`)
@@ -333,7 +334,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it('CreateLead: should create a lead', async function() {
+  it('CreateLead: should create a set of leads', async function() {
     this.timeout(TIMEOUT_MS);
 
     async function sendLead(data) {
@@ -342,9 +343,9 @@ describe('API Integration tests', () => {
         .set('Content-Type', 'application/json')
         .set('X-API-Key', publicApiKey)
         .send({
-          systemData: {},
-          leadData: data,
-          trackingData: {}
+          system: {},
+          lead: data,
+          tracking: {}
         })
         .expect('Content-Type', /application\/json/)
         .expect(201);
@@ -357,15 +358,137 @@ describe('API Integration tests', () => {
         promises.push(p);
         let res  = await p;
         assert.isObject(res.body);
-        assert.hasAllKeys(res.body.leadData, ['firstname', 'lastname', 'age']);
-        assert.strictEqual(res.body.leadData.firstname, l.firstname);
-        assert.strictEqual(res.body.leadData.lastname, l.lastname);
-        assert.strictEqual(res.body.leadData.age, l.age);
+        assert.hasAllKeys(res.body.lead, ['firstname', 'lastname', 'age']);
+        assert.strictEqual(res.body.lead.firstname, l.firstname);
+        assert.strictEqual(res.body.lead.lastname, l.lastname);
+        assert.strictEqual(res.body.lead.age, l.age);
       };
     } catch (err) {
       throw err;
     }
     return Promise.all(promises);
+  });
+
+  it('should query leads order by default (created desc)', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 5);
+
+      // 1st lead should be the last one created
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'Fred',
+        lastname: 'Blogs',
+        age: 27
+      });
+
+      // 5th lead should be the first one created
+      assert.isObject(res.body[4]);
+      assert.deepEqual(res.body[4].lead, {
+        firstname: 'David',
+        lastname: 'Smith',
+        age: 42
+      });
+      done();
+    });
+  });
+
+  it('should query all leads order by created asc', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads?orderDirection=asc`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isArray(res.body);
+      assert.lengthOf(res.body, 5);
+
+      // 1st lead should be the first one created
+      assert.isObject(res.body[0]);
+      assert.deepEqual(res.body[0].lead, {
+        firstname: 'David',
+        lastname: 'Smith',
+        age: 42
+      });
+
+      // 5th lead should be the last one created
+      assert.isObject(res.body[4]);
+      assert.deepEqual(res.body[4].lead, {
+        firstname: 'Fred',
+        lastname: 'Blogs',
+        age: 27
+      });
+
+      // keep a copy of the lead ids
+      for (const item of res.body) {
+        leadIds.push(item.leadId);
+      }
+      done();
+    });
+  });
+
+  it('Get a single lead by ID', function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads/${leadIds[1]}`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isObject(res.body);
+      assert.deepEqual(res.body.lead, {
+        firstname: 'Borris',
+        lastname: 'Johnson',
+        age: 56
+      });
+      done();
+    });
+  });
+
+  it(`should fail to get a lead by incorrect lead ID`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .get(`/projects/${newProjectId}/leads/notthere`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(404)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isObject(res.body);
+      assert.hasAllKeys(res.body, [
+        'status',
+        'message'
+      ]);
+      assert.strictEqual(res.body.status, 404);
+      assert.strictEqual(res.body.message, 'leads/lead-not-found');
+      done();
+    });
   });
 
   it(`DeleteProject: should delete project '${newProjectId}'`, function(done) {
