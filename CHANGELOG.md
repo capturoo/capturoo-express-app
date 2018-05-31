@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.12.0 (31 May 2018)
++ Rename addLead to createLead
++ Adds additional code coverage
+
 ## 0.11.2 (30 May 2018)
 + Fixes deletion of project including leads
 

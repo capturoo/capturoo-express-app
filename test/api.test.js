@@ -8,16 +8,45 @@ const config = require('../config');
 const clientConfig = require('../client-config');
 
 const TIMEOUT_SETUP_MS = 30 * 1000;
-const TIMEOUT_MS = 10 * 1000;
+const TIMEOUT_MS = 30 * 1000;
 const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
 const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
 const TEST_SHOWTOKEN = (process.env.TEST_SHOWTOKEN === 'true') ? true : false;
+
+const leads = [
+  {
+    firstname: 'David',
+    lastname: 'Smith',
+    age: 42
+  },
+  {
+    firstname: 'Borris',
+    lastname: 'Johnson',
+    age: 56
+  },
+  {
+    firstname: 'Julia',
+    lastname: 'Carter',
+    age: 28
+  },
+  {
+    firstname: 'Paul',
+    lastname: 'Rogers',
+    age: 34
+  },
+  {
+    firstname: 'Fred',
+    lastname: 'Blogs',
+    age: 27
+  }
+];
 
 describe('API Integration tests', () => {
   var endpoint;
   var sdk;
   var token;
   var accountObj;
+  var publicApiKey;
 
 	var newProjectId = (function () {
     let base62 = '0123456789';
@@ -32,8 +61,8 @@ describe('API Integration tests', () => {
   // that is used for all subsequent requests
   before(function(done) {
     this.timeout(TIMEOUT_SETUP_MS);
-   
-    if (TEST_ENDPOINT === 'app') { 
+
+    if (TEST_ENDPOINT === 'app') {
       const ExpressApp = require('../lib/app');
       endpoint = new ExpressApp(config);
     } else {
@@ -54,7 +83,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should retrieve the current user '${TEST_EMAIL}' account`, function(done) {
+  it(`GetAccount: should retrieve the current user '${TEST_EMAIL}' account`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get('/account')
@@ -83,7 +112,32 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should create a new project '${newProjectId}'`, function(done) {
+  it(`CreateProject: should fail to create a project due to missing name field`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+      .post('/projects')
+      .set('Content-Type', 'application/json')
+      .set('x-access-token', token)
+      .send({
+        projectId: newProjectId
+      })
+      .expect('Content-Type', /application\/json/)
+      .expect(400)
+      .end(function(err, res) {
+        if (err) {
+          console.error(err);
+          return done(err);
+        }
+
+        assert.isObject(res.body);
+        assert.hasAllKeys(res.body, ['status', 'message', 'info']);
+        assert.equal(res.body.status, 400);
+        assert.strictEqual(res.body.message, 'api/bad-request');
+        done();
+      });
+  });
+
+  it(`CreateProject: should create a new project '${newProjectId}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .post('/projects')
@@ -115,7 +169,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should check project '${newProjectId}' exists`, function(done) {
+  it(`ProjectExists: should check project '${newProjectId}' exists`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .head(`/projects/${newProjectId}`)
@@ -132,7 +186,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should ensure project '${newProjectId}-not-there' does not exist`, function(done) {
+  it(`ProjectExists: should ensure project '${newProjectId}-not-there' does not exist`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .head(`/projects/${newProjectId}-not-there`)
@@ -147,12 +201,12 @@ describe('API Integration tests', () => {
         assert.isObject(res.body);
         assert.isEmpty(res.body);
         done();
-      }); 
+      });
   });
 
-  it(`should fail to create the same project '${newProjectId}'`, function(done) {
+  it(`CreateProject: should fail to create the same project '${newProjectId}'`, function(done) {
   	this.timeout(TIMEOUT_MS);
-    request(endpoint)  
+    request(endpoint)
       .post('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
@@ -175,10 +229,9 @@ describe('API Integration tests', () => {
         assert.strictEqual(res.body.message, 'projects/project-id-taken');
         done();
       });
-
   });
 
-  it(`should get project '${newProjectId}' by its id`, function(done) {
+  it(`GetProject: should get project '${newProjectId}' by its id`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/${newProjectId}`)
@@ -206,11 +259,15 @@ describe('API Integration tests', () => {
         assert.strictEqual(res.body.accountId, accountObj.accountId);
         assert.strictEqual(res.body.name, 'Supertest Project');
         assert.strictEqual(res.body.leadsCount, 0);
+        assert.lengthOf(res.body.publicApiKey, 22);
+
+        // keep a copy of this project's public API key for lead capture below
+        publicApiKey = res.body.publicApiKey;
         done();
       });
   });
 
-  it(`should fail to get project '${newProjectId}' because it is missing x-access-token`, function(done) {
+  it(`GetProject: should fail to get project '${newProjectId}' because it is missing x-access-token`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/${newProjectId}`)
@@ -233,7 +290,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it('should fail to retrieve a project that does not exist', function(done) {
+  it('GetProject: should fail to retrieve a project that does not exist', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/no-such-project-${newProjectId}`)
@@ -258,7 +315,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it('should retrieve a list of all projects', function(done) {
+  it('ListProjects: should retrieve a list of all projects', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get('/projects')
@@ -276,7 +333,42 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should delete project '${newProjectId}'`, function(done) {
+  it('CreateLead: should create a lead', async function() {
+    this.timeout(TIMEOUT_MS);
+
+    async function sendLead(data) {
+      return request(endpoint)
+        .post(`/leads`)
+        .set('Content-Type', 'application/json')
+        .set('X-API-Key', publicApiKey)
+        .send({
+          systemData: {},
+          leadData: data,
+          trackingData: {}
+        })
+        .expect('Content-Type', /application\/json/)
+        .expect(201);
+    }
+
+    try {
+      var promises = [];
+      for (const l of leads) {
+        let p = sendLead(l);
+        promises.push(p);
+        let res  = await p;
+        assert.isObject(res.body);
+        assert.hasAllKeys(res.body.leadData, ['firstname', 'lastname', 'age']);
+        assert.strictEqual(res.body.leadData.firstname, l.firstname);
+        assert.strictEqual(res.body.leadData.lastname, l.lastname);
+        assert.strictEqual(res.body.leadData.age, l.age);
+      };
+    } catch (err) {
+      throw err;
+    }
+    return Promise.all(promises);
+  });
+
+  it(`DeleteProject: should delete project '${newProjectId}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .delete(`/projects/${newProjectId}`)
@@ -295,7 +387,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should fail to delete project '${newProjectId}' as it just got deleted`, function(done) {
+  it(`DeleteProject: should fail to delete project '${newProjectId}' as it just got deleted`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .delete(`/projects/${newProjectId}`)
@@ -319,7 +411,7 @@ describe('API Integration tests', () => {
       });
   });
 
-  it(`should fail to retrieve the previously deleted project '${newProjectId}'`, function(done) {
+  it(`GetProject: should fail to get the previously deleted project '${newProjectId}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get(`/projects/${newProjectId}`)
