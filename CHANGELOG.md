@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.13.0 (31 May 2018)
++ Change leads to use { system, data, lead}
++ Get leads with ordering and direction
++ Get lead by lead ID
+
 ## 0.12.0 (31 May 2018)
 + Rename addLead to createLead
 + Adds additional code coverage
