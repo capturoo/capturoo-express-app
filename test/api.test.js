@@ -7,8 +7,8 @@ const { DashboardSDK } = require('capturoo-dashboard-sdk');
 const config = require('../config');
 const clientConfig = require('../client-config');
 
-const TIMEOUT_SETUP_MS = 30 * 1000;
-const TIMEOUT_MS = 30 * 1000;
+const TIMEOUT_SETUP_MS = 40 * 1000;
+const TIMEOUT_MS = 40 * 1000;
 const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
 const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
 const TEST_SHOWTOKEN = (process.env.TEST_SHOWTOKEN === 'true') ? true : false;
@@ -48,6 +48,7 @@ describe('API Integration tests', () => {
   var accountObj;
   var publicApiKey;
   var leadIds = [];
+  var leadIdToDelete;
   var startAfter;
 
 	var newProjectId = (function () {
@@ -340,7 +341,7 @@ describe('API Integration tests', () => {
 
     async function sendLead(data) {
       return request(endpoint)
-        .post(`/leads`)
+        .post('/leads')
         .set('Content-Type', 'application/json')
         .set('X-API-Key', publicApiKey)
         .send({
@@ -368,6 +369,104 @@ describe('API Integration tests', () => {
       throw err;
     }
     return Promise.all(promises);
+  });
+
+  it('should create a single lead', function(done) {
+    this.timeout(TIMEOUT_MS);
+    let data = {
+      firstname: 'Soontobe',
+      lastname: 'Deleted',
+      age: 99
+    };
+
+    request(endpoint)
+    .post('/leads')
+    .set('Content-Type', 'application/json')
+    .set('X-API-Key', publicApiKey)
+    .send({
+      system: {},
+      lead: data,
+      tracking: {}
+    })
+    .expect('Content-Type', /application\/json/)
+    .expect(201)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isObject(res.body);
+      leadIdToDelete = res.body.system.leadId;
+      done();
+    });
+  });
+
+  it(`should delete an individual lead (${leadIdToDelete})`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(204)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isObject(res.body);
+      leadIdToDelete = res.body.leadId;
+      done();
+    });
+  });
+
+  it(`should fail to delete an individual lead '${leadIdToDelete}' from project '${newProjectId}-nt'`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .delete(`/projects/${newProjectId}-nt/leads/${leadIdToDelete}`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(404)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isObject(res.body);
+      assert.hasAllKeys(res.body, [
+        'status',
+        'message'
+      ]);
+      assert.strictEqual(res.body.status, 404);
+      assert.strictEqual(res.body.message, 'projects/project-not-found');
+      done();
+    });
+  });
+
+  it(`should fail to delete an individual lead '${leadIdToDelete}-nt' from project '${newProjectId}'`, function(done) {
+    this.timeout(TIMEOUT_MS);
+    request(endpoint)
+    .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}-nt`)
+    .set('Content-Type', 'application/json')
+    .set('x-access-token', token)
+    .expect(404)
+    .end(function(err, res) {
+      if (err) {
+        console.error(res.text);
+        return done(err);
+      }
+
+      assert.isObject(res.body);
+      assert.hasAllKeys(res.body, [
+        'status',
+        'message'
+      ]);
+      assert.strictEqual(res.body.status, 404);
+      assert.strictEqual(res.body.message, 'leads/lead-not-found');
+      done();
+    });
   });
 
   it('should query leads order by default (created desc)', function(done) {
