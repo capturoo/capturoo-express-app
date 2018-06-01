@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.15.0 (1 June 2018)
++ DeleteLead operation
++ Improved unit testing
+
 ## 0.14.0 (31 May 2018)
 + Pagination with startAt
 + Improved unit testing
