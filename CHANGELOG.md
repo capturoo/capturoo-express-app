@@ -1,4 +1,6 @@
 # CHANGELOG
+## 0.15.1 (1 June 2018)
++ .npmignore file to make smaller pack file
 
 ## 0.15.0 (1 June 2018)
 + DeleteLead operation

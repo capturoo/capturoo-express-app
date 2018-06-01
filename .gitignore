@@ -2,5 +2,6 @@
 *.log
 *.tgz
 config.json
+client-config.js
 coverage/
 node_modules/

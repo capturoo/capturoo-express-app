@@ -1,0 +1,8 @@
+.nyc_output
+*.tgz
+client-config.js
+config.json
+coverage/
+test/
+server.js
+scripts/
