@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.16.1 (1 June 2018)
++ Fix mismatched APP_VERSION string
+
 ## 0.16.0 (1 June 2018)
 + Uses x-capturoo-timing and x-capturoo-version headers
 
