@@ -371,7 +371,7 @@ describe('API Integration tests', () => {
     return Promise.all(promises);
   });
 
-  it('should create a single lead', function(done) {
+  it('CreateLead: should create a single lead', function(done) {
     this.timeout(TIMEOUT_MS);
     let data = {
       firstname: 'Soontobe',
@@ -402,7 +402,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it(`should delete an individual lead (${leadIdToDelete})`, function(done) {
+  it(`DeleteLead: should delete an individual lead (${leadIdToDelete})`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}`)
@@ -421,7 +421,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it(`should fail to delete an individual lead '${leadIdToDelete}' from project '${newProjectId}-nt'`, function(done) {
+  it(`DeleteLead: should fail to delete an individual lead '${leadIdToDelete}' from project '${newProjectId}-nt'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .delete(`/projects/${newProjectId}-nt/leads/${leadIdToDelete}`)
@@ -445,7 +445,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it(`should fail to delete an individual lead '${leadIdToDelete}-nt' from project '${newProjectId}'`, function(done) {
+  it(`DeleteLead: should fail to delete an individual lead '${leadIdToDelete}-nt' from project '${newProjectId}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}-nt`)
@@ -469,7 +469,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should query leads order by default (created desc)', function(done) {
+  it('QueryLeads: should query leads order by default (created desc)', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads`)
@@ -504,7 +504,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should query all leads order by created asc', function(done) {
+  it('QueryLeads: should query all leads order by created asc', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderDirection=asc`)
@@ -527,6 +527,7 @@ describe('API Integration tests', () => {
         lastname: 'Smith',
         age: 42
       });
+      assert.hasAnyKeys(res.body[0].system, ['created', 'ip', 'leadNum', 'leadId']);
 
       // 5th lead should be the last one created
       assert.isObject(res.body[4]);
@@ -535,16 +536,18 @@ describe('API Integration tests', () => {
         lastname: 'Blogs',
         age: 27
       });
+      assert.hasAnyKeys(res.body[4].system, ['created', 'ip', 'leadNum', 'leadId']);
+
 
       // keep a copy of the lead ids
       for (const item of res.body) {
-        leadIds.push(item.leadId);
+        leadIds.push(item.system.leadId);
       }
       done();
     });
   });
 
-  it('should get leads orderBy system.created ascending limit 2', function(done) {
+  it('QueryLeads: should get leads orderBy system.created ascending limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&limit=2`)
@@ -579,7 +582,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
+  it('QueryLeads: should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
@@ -614,7 +617,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
+  it('QueryLeads: should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
@@ -641,7 +644,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should get leads orderBy system.created descending limit 2', function(done) {
+  it('QueryLeads: should get leads orderBy system.created descending limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&limit=2`)
@@ -676,7 +679,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should get leads orderBy system.created descending startAfter last limit 2', function(done) {
+  it('QueryLeads: should get leads orderBy system.created descending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
@@ -711,7 +714,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('should get leads orderBy system.created descending startAfter last limit 2', function(done) {
+  it('QueryLeads: should get leads orderBy system.created descending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
@@ -738,7 +741,7 @@ describe('API Integration tests', () => {
     });
   });
 
-  it('Get a single lead by ID', function(done) {
+  it('GetLead: Get a single lead by ID', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads/${leadIds[1]}`)
@@ -757,11 +760,12 @@ describe('API Integration tests', () => {
         lastname: 'Johnson',
         age: 56
       });
+      assert.strictEqual(res.body.system.leadId, leadIds[1]);
       done();
     });
   });
 
-  it(`should fail to get a lead by incorrect lead ID`, function(done) {
+  it(`GetLead: should fail to get a lead by incorrect lead ID`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
     .get(`/projects/${newProjectId}/leads/notthere`)
