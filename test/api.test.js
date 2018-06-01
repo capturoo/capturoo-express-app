@@ -12,6 +12,7 @@ const TIMEOUT_MS = 40 * 1000;
 const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
 const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
 const TEST_SHOWTOKEN = (process.env.TEST_SHOWTOKEN === 'true') ? true : false;
+const APP_VERSION = process.env.TEST_APP_VERSION;
 
 const leads = [
   {
@@ -41,7 +42,7 @@ const leads = [
   }
 ];
 
-describe('API Integration tests', () => {
+describe(`Integration tests (API version ${APP_VERSION})`, () => {
   var endpoint;
   var sdk;
   var token;
@@ -64,7 +65,6 @@ describe('API Integration tests', () => {
   // that is used for all subsequent requests
   before(function(done) {
     this.timeout(TIMEOUT_SETUP_MS);
-
     if (TEST_ENDPOINT === 'app') {
       const ExpressApp = require('../lib/app');
       endpoint = new ExpressApp(config);
@@ -91,8 +91,11 @@ describe('API Integration tests', () => {
     request(endpoint)
       .get('/account')
       .set('Content-Type', 'application/json')
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .set('x-access-token', token)
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -121,10 +124,13 @@ describe('API Integration tests', () => {
       .post('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .send({
         projectId: newProjectId
       })
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(400)
       .end(function(err, res) {
         if (err) {
@@ -146,11 +152,14 @@ describe('API Integration tests', () => {
       .post('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .send({
         projectId: newProjectId,
         name: 'Supertest Project'
       })
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(201)
       .end(function(err, res) {
         if (err) {
@@ -177,7 +186,10 @@ describe('API Integration tests', () => {
     request(endpoint)
       .head(`/projects/${newProjectId}`)
       .set('x-access-token', token)
-      .expect(200)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
+      .expect('x-capturoo-app-version', APP_VERSION)
+      .expect(204)
       .end(function(err, res) {
         if (err) {
           console.error(res.text);
@@ -194,6 +206,9 @@ describe('API Integration tests', () => {
     request(endpoint)
       .head(`/projects/${newProjectId}-not-there`)
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(404)
       .end(function(err, res) {
         if (err) {
@@ -213,11 +228,14 @@ describe('API Integration tests', () => {
       .post('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .send({
         projectId: newProjectId,
         name: 'Supertest Project'
       })
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(409)
       .end(function(err, res) {
         if (err) {
@@ -240,7 +258,10 @@ describe('API Integration tests', () => {
       .get(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -275,7 +296,10 @@ describe('API Integration tests', () => {
     request(endpoint)
       .get(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(403)
       .end(function(err, res) {
         if (err) {
@@ -299,7 +323,10 @@ describe('API Integration tests', () => {
       .get(`/projects/no-such-project-${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(404)
       .end(function(err, res) {
         if (err) {
@@ -324,7 +351,10 @@ describe('API Integration tests', () => {
       .get('/projects')
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(200)
       .end(function(err, res) {
         if (err) {
@@ -344,12 +374,15 @@ describe('API Integration tests', () => {
         .post('/leads')
         .set('Content-Type', 'application/json')
         .set('X-API-Key', publicApiKey)
+        .set('x-capturoo-timing', 'on')
+        .set('x-capturoo-version', 'on')
         .send({
           system: {},
           lead: data,
           tracking: {}
         })
         .expect('Content-Type', /application\/json/)
+        .expect('x-capturoo-app-version', APP_VERSION)
         .expect(201);
     }
 
@@ -383,12 +416,15 @@ describe('API Integration tests', () => {
     .post('/leads')
     .set('Content-Type', 'application/json')
     .set('X-API-Key', publicApiKey)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
     .send({
       system: {},
       lead: data,
       tracking: {}
     })
     .expect('Content-Type', /application\/json/)
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(201)
     .end(function(err, res) {
       if (err) {
@@ -408,6 +444,9 @@ describe('API Integration tests', () => {
     .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(204)
     .end(function(err, res) {
       if (err) {
@@ -427,6 +466,9 @@ describe('API Integration tests', () => {
     .delete(`/projects/${newProjectId}-nt/leads/${leadIdToDelete}`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(404)
     .end(function(err, res) {
       if (err) {
@@ -451,6 +493,9 @@ describe('API Integration tests', () => {
     .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}-nt`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(404)
     .end(function(err, res) {
       if (err) {
@@ -475,6 +520,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -510,6 +558,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderDirection=asc`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -553,6 +604,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -588,6 +642,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -623,6 +680,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -650,6 +710,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -685,6 +748,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -720,6 +786,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -747,6 +816,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads/${leadIds[1]}`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(200)
     .end(function(err, res) {
       if (err) {
@@ -771,6 +843,9 @@ describe('API Integration tests', () => {
     .get(`/projects/${newProjectId}/leads/notthere`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
+    .set('x-capturoo-timing', 'on')
+    .set('x-capturoo-version', 'on')
+    .expect('x-capturoo-app-version', APP_VERSION)
     .expect(404)
     .end(function(err, res) {
       if (err) {
@@ -795,6 +870,9 @@ describe('API Integration tests', () => {
       .delete(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(204)
       .end(function(err, res) {
         if (err) {
@@ -814,6 +892,9 @@ describe('API Integration tests', () => {
       .delete(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(404)
       .end(function(err, res) {
         if (err) {
@@ -838,7 +919,10 @@ describe('API Integration tests', () => {
       .get(`/projects/${newProjectId}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
       .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
       .expect(404)
       .end(function(err, res) {
         if (err) {

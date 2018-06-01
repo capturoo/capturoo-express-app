@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.16.0 (1 June 2018)
++ Uses x-capturoo-timing and x-capturoo-version headers
+
 ## 0.15.2 (1 June 2018)
 + Move root level leadId property to system.leadId for GetLead and QueryLeads operations
 + Unit test improvements to catch missing keys in the lead system object
