@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.17.0 (2 June 2018)
++ Remove HTTP HEAD requests as Google Cloud Functions do not support this
+
 ## 0.16.1 (1 June 2018)
 + Fix mismatched APP_VERSION string
 

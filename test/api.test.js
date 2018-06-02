@@ -181,47 +181,6 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       });
   });
 
-  it(`ProjectExists: should check project '${newProjectId}' exists`, function(done) {
-    this.timeout(TIMEOUT_MS);
-    request(endpoint)
-      .head(`/projects/${newProjectId}`)
-      .set('x-access-token', token)
-      .set('x-capturoo-timing', 'on')
-      .set('x-capturoo-version', 'on')
-      .expect('x-capturoo-app-version', APP_VERSION)
-      .expect(204)
-      .end(function(err, res) {
-        if (err) {
-          console.error(res.text);
-          return done(err);
-        }
-        assert.isObject(res.body);
-        assert.isEmpty(res.body);
-        done();
-      });
-  });
-
-  it(`ProjectExists: should ensure project '${newProjectId}-not-there' does not exist`, function(done) {
-    this.timeout(TIMEOUT_MS);
-    request(endpoint)
-      .head(`/projects/${newProjectId}-not-there`)
-      .set('x-access-token', token)
-      .set('x-capturoo-timing', 'on')
-      .set('x-capturoo-version', 'on')
-      .expect('x-capturoo-app-version', APP_VERSION)
-      .expect(404)
-      .end(function(err, res) {
-        if (err) {
-          console.error(res.text);
-          return done(err);
-        }
-
-        assert.isObject(res.body);
-        assert.isEmpty(res.body);
-        done();
-      });
-  });
-
   it(`CreateProject: should fail to create the same project '${newProjectId}'`, function(done) {
   	this.timeout(TIMEOUT_MS);
     request(endpoint)
