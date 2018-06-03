@@ -1,4 +1,6 @@
 # CHANGELOG
+## 0.18.3 (2 June 2018)
++ Fix broken versions in package.json (tag and unit tests), lib/app.js
 ## 0.18.2 (2 June 2018)
 + Fix broken version in package.json
 
