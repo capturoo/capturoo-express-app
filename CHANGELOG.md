@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.18.0 (2 June 2018)
++ Use nested sub-collections account->projects->leads instead of flat root level collections
+
 ## 0.17.0 (2 June 2018)
 + Remove HTTP HEAD requests as Google Cloud Functions do not support this
 
