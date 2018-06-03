@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.18.1 (2 June 2018)
++ Fix broken semveg tag for app
+
 ## 0.18.0 (2 June 2018)
 + Use nested sub-collections account->projects->leads instead of flat root level collections
 
