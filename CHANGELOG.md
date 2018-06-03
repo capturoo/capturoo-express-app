@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.18.2 (2 June 2018)
++ Fix broken version in package.json
+
 ## 0.18.1 (2 June 2018)
 + Fix broken semveg tag for app
 
