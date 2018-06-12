@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.19.0 (12 June 2018)
++ Payloads use aid, pid and lid short forms
++ Error messages return as a JSON string
+
 ## 0.18.3 (2 June 2018)
 + Fix broken versions in package.json (tag and unit tests), lib/app.js
 ## 0.18.2 (2 June 2018)

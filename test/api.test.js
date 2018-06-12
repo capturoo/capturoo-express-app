@@ -42,6 +42,7 @@ const leads = [
   }
 ];
 
+
 describe(`Integration tests (API version ${APP_VERSION})`, () => {
   var endpoint;
   var sdk;
@@ -52,7 +53,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   var leadIdToDelete;
   var startAfter;
 
-	var newProjectId = (function () {
+	var newPid = (function () {
     let base62 = '0123456789';
     let str = '';
     for (let b of crypto.randomBytes(6)) {
@@ -105,14 +106,14 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
 
 				assert.isObject(res.body);
         assert.hasAllKeys(res.body, [
-          'accountId',
+          'aid',
           'email',
           'displayName',
           'privateApiKey',
           'created',
           'lastModified'
         ]);
-        assert.lengthOf(res.body.accountId, 28);
+        assert.lengthOf(res.body.aid, 28);
         assert.lengthOf(res.body.created, 24);
         assert.lengthOf(res.body.lastModified, 24);
         accountObj = res.body;
@@ -129,7 +130,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   //     .set('x-capturoo-timing', 'on')
   //     .set('x-capturoo-version', 'on')
   //     .send({
-  //       projectId: newProjectId
+  //       pid: newPid
   //     })
   //     .expect('Content-Type', /application\/json/)
   //     .expect('x-capturoo-app-version', APP_VERSION)
@@ -148,7 +149,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   //     });
   // });
 
-  it(`CreateProject: should create a new project '${newProjectId}'`, function(done) {
+  it(`CreateProject: should create a new project '${newPid}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .post('/projects')
@@ -157,7 +158,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       .set('x-capturoo-timing', 'on')
       .set('x-capturoo-version', 'on')
       .send({
-        projectId: newProjectId,
+        pid: newPid,
         projectName: 'Supertest Project'
       })
       .expect('Content-Type', /application\/json/)
@@ -169,21 +170,20 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
           return done(err);
         }
         assert.hasAllKeys(res.body, [
-          'projectId',
-          'accountId',
+          'pid',
           'projectName',
           'leadsCount',
           'publicApiKey',
           'created',
           'lastModified'
         ]);
-        assert.strictEqual(res.body.projectId, newProjectId);
+        assert.strictEqual(res.body.pid, newPid);
         assert.strictEqual(res.body.projectName, 'Supertest Project');
         done();
       });
   });
 
-  it(`CreateProject: should fail to create the same project '${newProjectId}'`, function(done) {
+  it(`CreateProject: should fail to create the same project '${newPid}'`, function(done) {
   	this.timeout(TIMEOUT_MS);
     request(endpoint)
       .post('/projects')
@@ -192,7 +192,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       .set('x-capturoo-timing', 'on')
       .set('x-capturoo-version', 'on')
       .send({
-        projectId: newProjectId,
+        pid: newPid,
         projectName: 'Supertest Project'
       })
       .expect('Content-Type', /application\/json/)
@@ -213,10 +213,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       });
   });
 
-  it(`GetProject: should get project '${newProjectId}' by its id`, function(done) {
+  it(`GetProject: should get project '${newPid}' by its id`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-      .get(`/projects/${newProjectId}`)
+      .get(`/projects/${newPid}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
       .set('x-capturoo-timing', 'on')
@@ -232,16 +232,14 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
 
         assert.isObject(res.body);
         assert.hasAllKeys(res.body, [
-          'projectId',
-          'accountId',
+          'pid',
           'projectName',
           'leadsCount',
           'publicApiKey',
           'created',
           'lastModified'
         ]);
-        assert.strictEqual(res.body.projectId, newProjectId);
-        assert.strictEqual(res.body.accountId, accountObj.accountId);
+        assert.strictEqual(res.body.pid, newPid);
         assert.strictEqual(res.body.projectName, 'Supertest Project');
         assert.strictEqual(res.body.leadsCount, 0);
         assert.lengthOf(res.body.publicApiKey, 22);
@@ -252,10 +250,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       });
   });
 
-  it(`GetProject: should fail to get project '${newProjectId}' as missing x-access-token`, function(done) {
+  it(`GetProject: should fail to get project '${newPid}' as missing x-access-token`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-      .get(`/projects/${newProjectId}`)
+      .get(`/projects/${newPid}`)
       .set('Content-Type', 'application/json')
       .set('x-capturoo-timing', 'on')
       .set('x-capturoo-version', 'on')
@@ -281,7 +279,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('GetProject: should fail to retrieve a project that does not exist', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-      .get(`/projects/no-such-project-${newProjectId}`)
+      .get(`/projects/no-such-project-${newPid}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
       .set('x-capturoo-timing', 'on')
@@ -330,7 +328,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('CreateLead: should create a set of leads', async function() {
     this.timeout(TIMEOUT_MS);
 
-    let xApiKeyBase64 = Buffer.from(`${accountObj.accountId}:${publicApiKey}`).toString('base64')
+    let xApiKeyBase64 = Buffer.from(`${accountObj.aid}:${publicApiKey}`).toString('base64')
 
     async function sendLead(data) {
       return request(endpoint)
@@ -375,7 +373,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       age: 99
     };
 
-    let xApiKeyBase64 = Buffer.from(`${accountObj.accountId}:${publicApiKey}`).toString('base64')
+    let xApiKeyBase64 = Buffer.from(`${accountObj.aid}:${publicApiKey}`).toString('base64')
 
     request(endpoint)
     .post('/leads')
@@ -398,15 +396,15 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       }
 
       assert.isObject(res.body);
-      leadIdToDelete = res.body.system.leadId;
+      leadIdToDelete = res.body.system.lid;
       done();
     });
   });
 
-  it(`DeleteLead: should delete an individual lead (${leadIdToDelete})`, function(done) {
+  it(`DeleteLead: should delete an individual lead`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}`)
+    .delete(`/projects/${newPid}/leads/${leadIdToDelete}`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -420,15 +418,14 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       }
 
       assert.isObject(res.body);
-      leadIdToDelete = res.body.leadId;
       done();
     });
   });
 
-  it(`DeleteLead: should fail to delete an individual lead '${leadIdToDelete}' from project '${newProjectId}-nt'`, function(done) {
+  it(`DeleteLead: should fail to delete an individual lead from project`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .delete(`/projects/${newProjectId}-nt/leads/${leadIdToDelete}`)
+    .delete(`/projects/${newPid}-nt/leads/${leadIdToDelete}`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -452,10 +449,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
     });
   });
 
-  it(`DeleteLead: should fail to delete an individual lead '${leadIdToDelete}-nt' from project '${newProjectId}'`, function(done) {
+  it(`DeleteLead: should fail to delete an individual lead from project`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .delete(`/projects/${newProjectId}/leads/${leadIdToDelete}-nt`)
+    .delete(`/projects/${newPid}/leads/${leadIdToDelete}-nt`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -482,7 +479,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should query leads order by default (created desc)', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads`)
+    .get(`/projects/${newPid}/leads`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -520,7 +517,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should query all leads order by created asc', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderDirection=asc`)
+    .get(`/projects/${newPid}/leads?orderDirection=asc`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -543,7 +540,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
         lastname: 'Smith',
         age: 42
       });
-      assert.hasAnyKeys(res.body[0].system, ['created', 'ip', 'leadNum', 'leadId']);
+      assert.hasAnyKeys(res.body[0].system, ['created', 'ip', 'leadNum', 'lid']);
 
       // 5th lead should be the last one created
       assert.isObject(res.body[4]);
@@ -552,12 +549,12 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
         lastname: 'Blogs',
         age: 27
       });
-      assert.hasAnyKeys(res.body[4].system, ['created', 'ip', 'leadNum', 'leadId']);
+      assert.hasAnyKeys(res.body[4].system, ['created', 'ip', 'leadNum', 'lid']);
 
 
       // keep a copy of the lead ids
       for (const item of res.body) {
-        leadIds.push(item.system.leadId);
+        leadIds.push(item.system.lid);
       }
       done();
     });
@@ -566,7 +563,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should get leads orderBy system.created ascending limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&limit=2`)
+    .get(`/projects/${newPid}/leads?orderBy=system_created&orderDirection=asc&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -604,7 +601,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
+    .get(`/projects/${newPid}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -642,7 +639,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should get leads orderBy system.created ascending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
+    .get(`/projects/${newPid}/leads?orderBy=system_created&orderDirection=asc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -672,7 +669,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should get leads orderBy system.created descending limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&limit=2`)
+    .get(`/projects/${newPid}/leads?orderBy=system_created&orderDirection=desc&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -710,7 +707,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should get leads orderBy system.created descending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
+    .get(`/projects/${newPid}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -748,7 +745,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should get leads orderBy system.created descending startAfter last limit 2', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
+    .get(`/projects/${newPid}/leads?orderBy=system_created&orderDirection=desc&startAfter=${startAfter}&limit=2`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -775,10 +772,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
     });
   });
 
-  it('GetLead: Get a single lead by ID', function(done) {
+  it('GetLead: should get a single lead by ID', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads/${leadIds[1]}`)
+    .get(`/projects/${newPid}/leads/${leadIds[1]}`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -797,7 +794,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
         lastname: 'Johnson',
         age: 56
       });
-      assert.strictEqual(res.body.system.leadId, leadIds[1]);
+      assert.strictEqual(res.body.system.lid, leadIds[1]);
       done();
     });
   });
@@ -805,7 +802,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it(`GetLead: should fail to get a lead by incorrect lead ID`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads/notthere`)
+    .get(`/projects/${newPid}/leads/notthere`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -829,10 +826,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
     });
   });
 
-  it(`DeleteProject: should delete project '${newProjectId}'`, function(done) {
+  it(`DeleteProject: should delete project '${newPid}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-      .delete(`/projects/${newProjectId}`)
+      .delete(`/projects/${newPid}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
       .set('x-capturoo-timing', 'on')
@@ -854,7 +851,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('QueryLeads: should query leads order by default (created desc)', function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-    .get(`/projects/${newProjectId}/leads`)
+    .get(`/projects/${newPid}/leads`)
     .set('Content-Type', 'application/json')
     .set('x-access-token', token)
     .set('x-capturoo-timing', 'on')
@@ -873,10 +870,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
     });
   });
 
-  it(`DeleteProject: should fail to delete project '${newProjectId}' as it just got deleted`, function(done) {
+  it(`DeleteProject: should fail to delete project '${newPid}' as it just got deleted`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-      .delete(`/projects/${newProjectId}`)
+      .delete(`/projects/${newPid}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
       .set('x-capturoo-timing', 'on')
@@ -900,10 +897,10 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       });
   });
 
-  it(`GetProject: should fail to get the previously deleted project '${newProjectId}'`, function(done) {
+  it(`GetProject: should fail to get the previously deleted project '${newPid}'`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
-      .get(`/projects/${newProjectId}`)
+      .get(`/projects/${newPid}`)
       .set('Content-Type', 'application/json')
       .set('x-access-token', token)
       .set('x-capturoo-timing', 'on')
