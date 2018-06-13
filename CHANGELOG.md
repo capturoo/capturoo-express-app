@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.21.0 (13 June 2018)
++ If no config is passed, the service layer calls admin.initializeApp()
+  with no params assuming we're being run from inside the Google Cloud
+  Platform.
 ## 0.20.0 (13 June 2018)
 + publicApiKey from customers perspective uses aid{28}key{6}
 + update unit tests
