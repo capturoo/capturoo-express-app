@@ -1,13 +1,14 @@
 {
   "name": "capturoo-express-app",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Capturoo API built on Node.js / Express",
   "main": "lib/app.js",
   "scripts": {
     "coverage": "google-chrome ./coverage/index.html",
     "start": "nodemon --inspect server.js",
-    "test": "env TEST_APP_VERSION=0.19.0 TEST_EMAIL=andy+sdktest@andyfusniak.com TEST_PASSWORD=testtest TEST_SHOWTOKEN=true nyc --all --clean --reporter=html mocha --slow 3000",
-    "test-staging": "env TEST_APP_VERSION=0.19.0 TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=https://api-staging.capturoo.com mocha --slow 1000"
+    "test": "env TEST_APP_VERSION=0.20.0 TEST_EMAIL=andy+sdktest@andyfusniak.com TEST_PASSWORD=testtest TEST_SHOWTOKEN=true nyc --all --clean --reporter=html mocha --slow 3000",
+    "test-staging": "env TEST_APP_VERSION=0.20.0 TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=https://api-staging.capturoo.com mocha --slow 1000",
+    "test-localhost": "env TEST_APP_VERSION=0.20.0 TEST_EMAIL=andy@andyfusniak.com TEST_PASSWORD=testtest TEST_ENDPOINT=http://localhost:3000 mocha --slow 1000"
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,6 @@
     "firebase-admin": "^5.12.1"
   },
   "devDependencies": {
-    "capturoo-dashboard-sdk": "file:../capturoo-dashboard-sdk",
     "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "mocha": "^5.2.0",

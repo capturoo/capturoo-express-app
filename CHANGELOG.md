@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.20.0 (13 June 2018)
++ publicApiKey from customers perspective uses aid{28}key{6}
++ update unit tests
+
 ## 0.19.0 (12 June 2018)
 + Payloads use aid, pid and lid short forms
 + Error messages return as a JSON string

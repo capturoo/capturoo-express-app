@@ -1,0 +1,5 @@
+#!/bin/bash
+npm link @capturoo/app
+npm link @capturoo/auth
+npm link @capturoo/capture
+npm link @capturoo/manage

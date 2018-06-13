@@ -5,9 +5,8 @@ const config = {
     projectId: 'capturoo-api-staging',
     messagingSenderId: '621971739024'
   },
-  axios: {
-    baseURL: 'http://localhost:3000',
-    timeout: 20000
+  capture: {
+    endpoint: 'http://localhost:3000'
   }
 };
 

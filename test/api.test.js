@@ -3,8 +3,9 @@ const crypto = require('crypto');
 const request = require('supertest');
 const chai = require('chai');
 const assert = chai.assert;
-const { DashboardSDK } = require('capturoo-dashboard-sdk');
 const config = require('../config');
+const capturoo = require('@capturoo/app');
+require('@capturoo/auth');
 const clientConfig = require('../client-config');
 
 const TIMEOUT_SETUP_MS = 40 * 1000;
@@ -45,7 +46,7 @@ const leads = [
 
 describe(`Integration tests (API version ${APP_VERSION})`, () => {
   var endpoint;
-  var sdk;
+  var auth;
   var token;
   var accountObj;
   var publicApiKey;
@@ -73,10 +74,11 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       endpoint = TEST_ENDPOINT;
     }
 
-    sdk = new DashboardSDK(clientConfig);
-		sdk.signInWithEmailAndPassword(TEST_EMAIL, process.env.TEST_PASSWORD)
+    capturoo.initApp(clientConfig);
+    auth = capturoo.auth();
+		auth.signInWithEmailAndPassword(TEST_EMAIL, process.env.TEST_PASSWORD)
       .then(userCredential => {
-        token = sdk.idTokenResult.token;
+        token = auth.idTokenResult.token;
         if (TEST_SHOWTOKEN) {
           console.log(token);
         }
@@ -242,7 +244,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
         assert.strictEqual(res.body.pid, newPid);
         assert.strictEqual(res.body.projectName, 'Supertest Project');
         assert.strictEqual(res.body.leadsCount, 0);
-        assert.lengthOf(res.body.publicApiKey, 22);
+        assert.lengthOf(res.body.publicApiKey, 6);
 
         // keep a copy of this project's public API key for lead capture below
         publicApiKey = res.body.publicApiKey;
@@ -328,13 +330,12 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   it('CreateLead: should create a set of leads', async function() {
     this.timeout(TIMEOUT_MS);
 
-    let xApiKeyBase64 = Buffer.from(`${accountObj.aid}:${publicApiKey}`).toString('base64')
-
+    let xApiKey = `${publicApiKey}${accountObj.aid}`;
     async function sendLead(data) {
       return request(endpoint)
         .post('/leads')
         .set('Content-Type', 'application/json')
-        .set('X-API-Key', xApiKeyBase64)
+        .set('X-API-Key', xApiKey)
         .set('x-capturoo-timing', 'on')
         .set('x-capturoo-version', 'on')
         .send({
@@ -373,32 +374,32 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       age: 99
     };
 
-    let xApiKeyBase64 = Buffer.from(`${accountObj.aid}:${publicApiKey}`).toString('base64')
+    let xApiKey = `${publicApiKey}${accountObj.aid}`;
 
     request(endpoint)
-    .post('/leads')
-    .set('Content-Type', 'application/json')
-    .set('X-API-Key', xApiKeyBase64)
-    .set('x-capturoo-timing', 'on')
-    .set('x-capturoo-version', 'on')
-    .send({
-      system: {},
-      lead,
-      tracking: {}
-    })
-    .expect('Content-Type', /application\/json/)
-    .expect('x-capturoo-app-version', APP_VERSION)
-    .expect(201)
-    .end(function(err, res) {
-      if (err) {
-        console.error(res.text);
-        return done(err);
-      }
+      .post('/leads')
+      .set('Content-Type', 'application/json')
+      .set('X-API-Key', xApiKey)
+      .set('x-capturoo-timing', 'on')
+      .set('x-capturoo-version', 'on')
+      .send({
+        system: {},
+        lead,
+        tracking: {}
+      })
+      .expect('Content-Type', /application\/json/)
+      .expect('x-capturoo-app-version', APP_VERSION)
+      .expect(201)
+      .end(function(err, res) {
+        if (err) {
+          console.error(res.text);
+          return done(err);
+        }
 
-      assert.isObject(res.body);
-      leadIdToDelete = res.body.system.lid;
-      done();
-    });
+        assert.isObject(res.body);
+        leadIdToDelete = res.body.system.lid;
+        done();
+      });
   });
 
   it(`DeleteLead: should delete an individual lead`, function(done) {
@@ -926,7 +927,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
   });
 
   after(function(done) {
-    sdk.signOut()
+    auth.signOut()
       .then(() => {
         done();
       })
