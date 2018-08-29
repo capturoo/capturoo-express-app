@@ -1,12 +1,12 @@
 const config = {
   firebase: {
-    apiKey: 'AIzaSyAiXnr28rLkuoxbx6G8tt4fRdTis7b-QT4',
-    authDomain: 'capturoo-api-staging.firebaseapp.com',
-    projectId: 'capturoo-api-staging',
-    messagingSenderId: '621971739024'
+    apiKey: 'AIzaSyASjhmcCf0F2a_uisydxI4XBmnkEkBi9Q8',
+    authDomain: 'capturoo-api-production.firebaseapp.com',
+    projectId: 'capturoo-api-production',
+    messagingSenderId: '889518461410'
   },
   capture: {
-    endpoint: 'http://localhost:3000'
+    endpoint: 'https://api.capturoo.com'
   }
 };
 

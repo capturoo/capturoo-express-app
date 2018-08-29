@@ -11,7 +11,6 @@ const clientConfig = require('../client-config');
 const TIMEOUT_SETUP_MS = 40 * 1000;
 const TIMEOUT_MS = 40 * 1000;
 const TEST_ENDPOINT = process.env.TEST_ENDPOINT || 'app';
-const TEST_EMAIL = process.env.TEST_EMAIL || 'user@example.com';
 const TEST_SHOWTOKEN = (process.env.TEST_SHOWTOKEN === 'true') ? true : false;
 const APP_VERSION = process.env.TEST_APP_VERSION;
 
@@ -76,7 +75,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
 
     capturoo.initApp(clientConfig);
     auth = capturoo.auth();
-		auth.signInWithEmailAndPassword(TEST_EMAIL, process.env.TEST_PASSWORD)
+		auth.signInWithEmailAndPassword(process.env.TEST_EMAIL, process.env.TEST_PASSWORD)
       .then(userCredential => {
         token = auth.idTokenResult.token;
         if (TEST_SHOWTOKEN) {
@@ -89,7 +88,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
       });
   });
 
-  it(`GetAccount: should retrieve the current user '${TEST_EMAIL}' account`, function(done) {
+  it(`GetAccount: should retrieve the current user account`, function(done) {
     this.timeout(TIMEOUT_MS);
     request(endpoint)
       .get('/account')
@@ -541,7 +540,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
         lastname: 'Smith',
         age: 42
       });
-      assert.hasAnyKeys(res.body[0].system, ['created', 'ip', 'leadNum', 'lid']);
+      assert.hasAnyKeys(res.body[0].system, ['created', 'ip', 'lid']);
 
       // 5th lead should be the last one created
       assert.isObject(res.body[4]);
@@ -550,7 +549,7 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
         lastname: 'Blogs',
         age: 27
       });
-      assert.hasAnyKeys(res.body[4].system, ['created', 'ip', 'leadNum', 'lid']);
+      assert.hasAnyKeys(res.body[4].system, ['created', 'ip', 'lid']);
 
 
       // keep a copy of the lead ids

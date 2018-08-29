@@ -1,4 +1,9 @@
 # CHANGELOG
+## 0.22.0 (Fri, 24 August 2018)
++ HTTP 409 for invalid query
++ RegExp filter on orderBy options
++ leadNum becomes lid
+
 ## 0.21.1 (13 June 2018)
 + Fix broken semver
 

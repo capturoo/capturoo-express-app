@@ -3,6 +3,7 @@
 client-config.js
 config.json
 coverage/
+dbschema/
 test/
 server.js
 scripts/
