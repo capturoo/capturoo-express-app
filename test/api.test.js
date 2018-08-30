@@ -115,8 +115,6 @@ describe(`Integration tests (API version ${APP_VERSION})`, () => {
           'lastModified'
         ]);
         assert.lengthOf(res.body.aid, 28);
-        assert.lengthOf(res.body.created, 24);
-        assert.lengthOf(res.body.lastModified, 24);
         accountObj = res.body;
         done();
       });

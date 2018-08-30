@@ -1,4 +1,9 @@
 # CHANGELOG
+## 0.23.0 (Wed, 29 August 2018)
++ Google Cloud Pub/Sub service dependency
++ Convert to ES2015 async/await syntax
++ Publish Pub/Sub messages to 'projects/capturoo-api-production/topics/api' topic
+
 ## 0.22.0 (Fri, 24 August 2018)
 + HTTP 409 for invalid query
 + RegExp filter on orderBy options
